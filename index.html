@@ -2,70 +2,588 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PORTAL | OC62ARR Hub</title>
-    <!-- Tailwind + Fonts + Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Neon Nexus | CyberLink Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- SortableJS for drag drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- QRCode.js -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none; /* lebih premium feel */
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Rajdhani', 'Orbitron', monospace;
-            background: radial-gradient(circle at 20% 30%, #0a0f1e, #02040c);
+            font-family: 'Rajdhani', 'Orbitron', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
             min-height: 100vh;
+            color: #eef5ff;
             overflow-x: hidden;
-            position: relative;
         }
-
-        /* Cyberpunk Grid & Scanlines */
         .cyber-grid {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 0, 255, 0.03) 1px, transparent 1px);
+            background-image: linear-gradient(#0ff1 1px, transparent 1px), linear-gradient(90deg, #0ff1 1px, transparent 1px);
             background-size: 40px 40px;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
+            animation: gridPulse 8s infinite alternate;
         }
-
-        /* Scan line animasi */
-        .scan-line {
+        @keyframes gridPulse {
+            0% { opacity: 0.2; background-size: 40px 40px; }
+            100% { opacity: 0.5; background-size: 44px 44px; }
+        }
+        .glitch-text {
+            font-family: 'Orbitron', monospace;
+            position: relative;
+            animation: glitchSkew 3s infinite;
+        }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0f1e;
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00de;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: 2px 0 #0ff;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim2 2.8s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(12px, 9999px, 40px, 0); }
+            50% { clip: rect(42px, 9999px, 88px, 0); }
+            100% { clip: rect(10px, 9999px, 70px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 110px, 0); }
+            50% { clip: rect(20px, 9999px, 55px, 0); }
+            100% { clip: rect(82px, 9999px, 130px, 0); }
+        }
+        .neon-card {
+            background: rgba(10, 20, 30, 0.45);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 255, 0.25);
+            box-shadow: 0 0 12px rgba(0, 255, 255, 0.2), inset 0 0 8px rgba(0, 255, 255, 0.05);
+            transition: all 0.25s ease;
+        }
+        .neon-card:hover {
+            border-color: #f0f;
+            box-shadow: 0 0 22px #f0f6, 0 0 8px #0ff;
+            transform: translateY(-3px) scale(1.01);
+        }
+        .link-item {
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(8px);
+            border-left: 4px solid #0ff;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .link-item:hover {
+            border-left-color: #ff44ee;
+            background: rgba(20, 30, 55, 0.7);
+            transform: translateX(8px) scale(1.02);
+            box-shadow: -6px 0 18px #0ff4, 0 6px 20px rgba(0,0,0,0.5);
+        }
+        .btn-neon {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-neon:hover {
+            background: #0ff2;
+            box-shadow: 0 0 12px #0ff;
+            text-shadow: 0 0 3px cyan;
+        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0a0f1e; }
+        ::-webkit-scrollbar-thumb { background: #0ff; border-radius: 10px; }
+        .loader-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(0deg, rgba(0,255,255,0.05) 0px, rgba(0,255,255,0.05) 2px, transparent 2px, transparent 8px);
-            pointer-events: none;
-            z-index: 2;
-            animation: scanMove 8s linear infinite;
+            background: #010105;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s ease;
         }
-
-        @keyframes scanMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 20px; }
+        .cyber-loader {
+            width: 80px;
+            height: 80px;
+            border: 4px solid #0ff;
+            border-top: 4px solid #ff44ee;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            box-shadow: 0 0 30px #0ff;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .admin-link-item {
+            transition: all 0.2s;
+        }
+        .admin-link-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+        .modal-login {
+            animation: fadeInUp 0.3s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
 
-        /* Glassmorphism cyberpunk */
-        .glass-panel {
-            background: rgba(8, 12, 25, 0.65);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0, 255, 255, 0.3);
+<div id="loader" class="loader-overlay">
+    <div class="text-center">
+        <div class="cyber-loader mx-auto mb-4"></div>
+        <p class="text-cyan-400 text-xl tracking-widest font-orbitron">NEO<span class="text-pink-400">LINK</span> BOOT</p>
+    </div>
+</div>
+
+<div class="cyber-grid"></div>
+
+<!-- Admin Login Modal -->
+<div id="loginModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center hidden">
+    <div class="modal-login neon-card rounded-2xl p-8 w-full max-w-md mx-4">
+        <div class="text-center mb-6">
+            <i class="fas fa-terminal text-5xl text-cyan-400 mb-3"></i>
+            <h2 class="text-3xl font-orbitron font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">ADMIN ACCESS</h2>
+            <p class="text-gray-400 text-sm mt-2">Masukkan PIN untuk mengakses panel</p>
+        </div>
+        <div class="space-y-4">
+            <div class="relative">
+                <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400"></i>
+                <input type="password" id="loginPinInput" placeholder="PIN (contoh: 1234)" class="w-full bg-black/60 border border-cyan-500/50 rounded-xl py-3 pl-10 pr-4 text-white font-mono text-lg focus:outline-none focus:border-pink-500 transition">
+            </div>
+            <button id="loginSubmitBtn" class="w-full bg-gradient-to-r from-cyan-600 to-purple-600 py-3 rounded-xl font-bold text-lg hover:shadow-[0_0_20px_#0ff] transition">🚀 LOGIN</button>
+            <p class="text-center text-xs text-gray-500 mt-4">Demo PIN: <span class="text-cyan-400 font-bold">1234</span></p>
+        </div>
+    </div>
+</div>
+
+<div id="app" class="relative z-10 max-w-2xl mx-auto px-4 py-6 md:py-10">
+    <!-- PUBLIC VIEW -->
+    <div id="publicView">
+        <div class="text-center mb-8">
+            <div class="relative inline-block">
+                <div class="w-28 h-28 mx-auto rounded-full border-4 border-cyan-400 shadow-[0_0_20px_#0ff] overflow-hidden bg-black/50 backdrop-blur-sm">
+                    <img id="profileAvatar" src="https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider" alt="avatar" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute -bottom-2 right-2 bg-pink-600 rounded-full p-1.5 shadow-lg"><i class="fas fa-bolt text-xs"></i></div>
+            </div>
+            <h1 id="profileName" class="glitch-text text-3xl md:text-4xl font-extrabold mt-4 tracking-wider" data-text="NEON_DRIFTER">NEON_DRIFTER</h1>
+            <p id="profileBio" class="text-gray-300 mt-2 max-w-sm mx-auto text-sm md:text-base">⚡ fullstack cybernaut | digital alchemist ⚡</p>
+            <div class="flex justify-center gap-3 mt-3">
+                <button id="copyProfileBtn" class="btn-neon text-xs px-3 py-1 rounded-full flex items-center gap-1"><i class="fas fa-copy"></i> Copy Link</button>
+                <button id="shareProfileBtn" class="btn-neon text-xs px-3 py-1 rounded-full flex items-center gap-1"><i class="fas fa-share-alt"></i> Share</button>
+                <button id="qrProfileBtn" class="btn-neon text-xs px-3 py-1 rounded-full flex items-center gap-1"><i class="fas fa-qrcode"></i> QR</button>
+            </div>
+            <button id="openAdminBtn" class="mt-4 text-xs text-cyan-400/70 hover:text-cyan-300 transition flex items-center gap-1 mx-auto"><i class="fas fa-shield-alt"></i> Admin Panel</button>
+        </div>
+
+        <div id="linksContainer" class="space-y-4 mt-6"></div>
+
+        <footer class="text-center text-gray-400 text-xs mt-12 pb-6 font-mono tracking-wider">
+            <i class="fas fa-copyright"></i> 2124 • NEON NEXUS • <i class="fas fa-shield-alt"></i> encrypted links
+        </footer>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="hidden neon-card rounded-2xl p-5 mt-4">
+        <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3 mb-4">
+            <h2 class="text-2xl font-orbitron text-cyan-300"><i class="fas fa-skull"></i> ADMIN DASH</h2>
+            <button id="logoutAdminBtn" class="text-pink-400 bg-black/40 px-3 py-1 rounded-lg text-sm"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+        
+        <div class="glass p-3 rounded-xl mb-4 grid grid-cols-1 gap-3">
+            <input type="text" id="adminName" placeholder="Display Name" class="bg-black/60 border border-cyan-400/50 rounded-lg p-2 text-white">
+            <input type="text" id="adminBio" placeholder="Bio" class="bg-black/60 border border-cyan-400/50 rounded-lg p-2 text-white">
+            <input type="text" id="adminAvatar" placeholder="Avatar URL (optional)" class="bg-black/60 border border-cyan-400/50 rounded-lg p-2 text-white">
+            <button id="updateProfileBtn" class="bg-gradient-to-r from-cyan-600 to-purple-600 py-2 rounded-lg font-bold">Update Profile</button>
+        </div>
+
+        <h3 class="text-xl font-bold text-pink-300 mb-2"><i class="fas fa-link"></i> MANAGE LINKS</h3>
+        <div id="adminLinksList" class="space-y-2 max-h-80 overflow-y-auto mb-4 p-1"></div>
+        <div class="mt-3 grid grid-cols-1 gap-3">
+            <button id="addNewLinkBtn" class="btn-neon py-2 rounded-xl w-full flex items-center justify-center gap-2"><i class="fas fa-plus-circle"></i> Tambah Link Baru</button>
+            <p class="text-[10px] text-center text-gray-400">Drag handle <i class="fas fa-grip-vertical"></i> untuk urutan link</p>
+        </div>
+    </div>
+</div>
+
+<audio id="clickSound" preload="auto">
+    <source src="https://www.soundjay.com/misc/sounds/beep-07.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    let appData = {
+        profile: {
+            name: "NEON_DRIFTER",
+            bio: "⚡ fullstack cybernaut | digital alchemist ⚡",
+            avatar: "https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider"
+        },
+        links: [
+            { title: "YouTube", url: "https://youtube.com", emoji: "🎬" },
+            { title: "GitHub", url: "https://github.com", emoji: "🐙" },
+            { title: "Twitch", url: "https://twitch.tv", emoji: "🎮" },
+            { title: "Portfolio", url: "https://neonforge.dev", emoji: "⚡" }
+        ]
+    };
+
+    let adminAuth = false;
+    const ADMIN_PIN = "1234";
+
+    function saveToLocal() {
+        localStorage.setItem("cyberlink_data", JSON.stringify(appData));
+    }
+
+    function loadFromLocal() {
+        const raw = localStorage.getItem("cyberlink_data");
+        if(raw) {
+            try {
+                const saved = JSON.parse(raw);
+                if(saved.profile && saved.links) appData = saved;
+            } catch(e) {}
+        }
+        renderPublicLinks();
+        if(adminAuth) renderAdminLinksList();
+        updateProfileUI();
+    }
+
+    function renderPublicLinks() {
+        const container = document.getElementById("linksContainer");
+        if(!container) return;
+        if(!appData.links.length) {
+            container.innerHTML = `<div class="text-center text-gray-400 p-6 neon-card rounded-2xl">🚫 tidak ada link, login admin untuk menambah</div>`;
+            return;
+        }
+        container.innerHTML = appData.links.map((link, idx) => `
+            <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="link-item block p-4 rounded-xl transition-all duration-200 group">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl drop-shadow-[0_0_6px_#0ff]">${link.emoji || '🔗'}</span>
+                        <span class="font-orbitron font-semibold text-lg tracking-wide">${escapeHtml(link.title)}</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-cyan-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all"></i>
+                </div>
+                <div class="text-xs text-gray-400 truncate mt-1">${link.url}</div>
+            </a>
+        `).join('');
+    }
+
+    function updateProfileUI() {
+        document.getElementById("profileName").innerText = appData.profile.name;
+        document.getElementById("profileName").setAttribute("data-text", appData.profile.name);
+        document.getElementById("profileBio").innerText = appData.profile.bio;
+        const avatarImg = document.getElementById("profileAvatar");
+        if(avatarImg) avatarImg.src = appData.profile.avatar || "https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider";
+    }
+
+    let sortableInstance = null;
+    function renderAdminLinksList() {
+        const adminContainer = document.getElementById("adminLinksList");
+        if(!adminContainer) return;
+        if(!appData.links.length) {
+            adminContainer.innerHTML = `<div class="text-center text-gray-400 p-4">Tidak ada link, klik tambah</div>`;
+            if(sortableInstance) sortableInstance.destroy();
+            return;
+        }
+        adminContainer.innerHTML = appData.links.map((link, idx) => `
+            <div class="admin-link-item bg-black/40 rounded-lg p-3 border-l-4 border-cyan-500 flex justify-between items-center gap-2" data-idx="${idx}">
+                <div class="flex items-center gap-3 flex-1 cursor-grab drag-handle">
+                    <i class="fas fa-grip-vertical text-gray-400"></i>
+                    <span class="text-xl">${link.emoji || '🔗'}</span>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm">${escapeHtml(link.title)}</span>
+                        <span class="text-xs text-gray-400 truncate max-w-[150px]">${link.url}</span>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="edit-link-btn text-yellow-300 hover:text-yellow-500" data-idx="${idx}"><i class="fas fa-edit"></i></button>
+                    <button class="delete-link-btn text-red-400 hover:text-red-600" data-idx="${idx}"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.edit-link-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                editLinkDialog(idx);
+            });
+        });
+        document.querySelectorAll('.delete-link-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                if(confirm("Hapus link ini?")) {
+                    appData.links.splice(idx, 1);
+                    saveToLocal();
+                    renderPublicLinks();
+                    renderAdminLinksList();
+                    reinitSortable();
+                    playClick();
+                }
+            });
+        });
+        reinitSortable();
+    }
+
+    function reinitSortable() {
+        const container = document.getElementById("adminLinksList");
+        if(!container) return;
+        if(sortableInstance) sortableInstance.destroy();
+        sortableInstance = new Sortable(container, {
+            handle: '.drag-handle',
+            animation: 200,
+            onEnd: function() {
+                const items = document.querySelectorAll('#adminLinksList .admin-link-item');
+                const newOrder = [];
+                items.forEach(item => {
+                    const idx = parseInt(item.getAttribute('data-idx'));
+                    if(!isNaN(idx) && appData.links[idx]) newOrder.push(appData.links[idx]);
+                });
+                if(newOrder.length === appData.links.length) {
+                    appData.links = newOrder;
+                    saveToLocal();
+                    renderPublicLinks();
+                    playClick();
+                }
+            }
+        });
+    }
+
+    function editLinkDialog(idx) {
+        const link = appData.links[idx];
+        const newTitle = prompt("Edit Judul:", link.title);
+        if(newTitle !== null && newTitle.trim() !== "") link.title = newTitle.trim();
+        const newUrl = prompt("Edit URL:", link.url);
+        if(newUrl !== null && newUrl.trim() !== "") link.url = newUrl.trim();
+        const newEmoji = prompt("Edit Emoji:", link.emoji);
+        if(newEmoji !== null && newEmoji.trim() !== "") link.emoji = newEmoji.trim();
+        saveToLocal();
+        renderPublicLinks();
+        renderAdminLinksList();
+        playClick();
+    }
+
+    function addNewLink() {
+        let title = prompt("Judul Link:", "New Cyber Link");
+        if(!title) title = "CyberLink";
+        let url = prompt("URL:", "https://");
+        if(!url) url = "https://example.com";
+        let emoji = prompt("Emoji:", "🌀");
+        if(!emoji) emoji = "🌀";
+        appData.links.push({ title: title.trim(), url: url.trim(), emoji: emoji.trim() });
+        saveToLocal();
+        renderPublicLinks();
+        renderAdminLinksList();
+        playClick();
+    }
+
+    function showAdminPanel(show) {
+        const adminDiv = document.getElementById("adminPanel");
+        const publicDiv = document.getElementById("publicView");
+        if(show) {
+            adminDiv.classList.remove("hidden");
+            publicDiv.classList.add("hidden");
+            renderAdminLinksList();
+            document.getElementById("adminName").value = appData.profile.name;
+            document.getElementById("adminBio").value = appData.profile.bio;
+            document.getElementById("adminAvatar").value = appData.profile.avatar;
+        } else {
+            adminDiv.classList.add("hidden");
+            publicDiv.classList.remove("hidden");
+            updateProfileUI();
+            renderPublicLinks();
+        }
+    }
+
+    function showLoginModal() {
+        const modal = document.getElementById("loginModal");
+        modal.classList.remove("hidden");
+        document.getElementById("loginPinInput").value = "";
+        document.getElementById("loginPinInput").focus();
+    }
+
+    function hideLoginModal() {
+        document.getElementById("loginModal").classList.add("hidden");
+    }
+
+    function attemptLogin(pin) {
+        if(pin === ADMIN_PIN) {
+            adminAuth = true;
+            localStorage.setItem("cyber_admin_auth", "true");
+            hideLoginModal();
+            showAdminPanel(true);
+            playClick();
+            return true;
+        } else {
+            alert("❌ PIN SALAH! Akses ditolak. Gunakan PIN: 1234");
+            playClick();
+            return false;
+        }
+    }
+
+    function logoutAdmin() {
+        adminAuth = false;
+        localStorage.removeItem("cyber_admin_auth");
+        showAdminPanel(false);
+        playClick();
+    }
+
+    function updateProfileFromAdmin() {
+        const newName = document.getElementById("adminName").value.trim() || "Neon User";
+        const newBio = document.getElementById("adminBio").value.trim() || "cyber entity";
+        const newAvatar = document.getElementById("adminAvatar").value.trim() || "https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider";
+        appData.profile.name = newName;
+        appData.profile.bio = newBio;
+        appData.profile.avatar = newAvatar;
+        saveToLocal();
+        updateProfileUI();
+        alert("✅ Profile updated!");
+        playClick();
+    }
+
+    function playClick() {
+        const sound = document.getElementById("clickSound");
+        if(sound) sound.play().catch(e=>console.log("audio need interaction"));
+    }
+
+    function copyProfileLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("🔗 Link profile copied!");
+        playClick();
+    }
+    
+    function shareProfile() {
+        if(navigator.share) {
+            navigator.share({ title: appData.profile.name, text: appData.profile.bio, url: window.location.href });
+        } else {
+            alert("Share: " + window.location.href);
+        }
+        playClick();
+    }
+    
+    function showQR() {
+        let modalDiv = document.getElementById("qrModal");
+        if(!modalDiv) {
+            modalDiv = document.createElement("div");
+            modalDiv.id = "qrModal";
+            modalDiv.className = "fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center";
+            modalDiv.innerHTML = `<div class="neon-card p-6 rounded-2xl text-center w-72"><h3 class="text-xl font-orbitron mb-3">SCAN ME</h3><div id="qrcodeContainer"></div><button id="closeQR" class="mt-4 bg-pink-600 px-4 py-1 rounded-lg">Tutup</button></div>`;
+            document.body.appendChild(modalDiv);
+            document.getElementById("closeQR").addEventListener("click",()=>{
+                modalDiv.classList.add("hidden");
+            });
+        }
+        const container = document.getElementById("qrcodeContainer");
+        container.innerHTML = "";
+        new QRCode(container, {
+            text: window.location.href,
+            width: 180,
+            height: 180,
+            colorDark: "#0ff",
+            colorLight: "#000000",
+        });
+        modalDiv.classList.remove("hidden");
+        playClick();
+    }
+
+    function init() {
+        loadFromLocal();
+        
+        const authStored = localStorage.getItem("cyber_admin_auth");
+        if(authStored === "true") {
+            adminAuth = true;
+            showAdminPanel(true);
+        } else {
+            adminAuth = false;
+            showAdminPanel(false);
+        }
+        
+        // Event listeners
+        document.getElementById("copyProfileBtn")?.addEventListener("click", copyProfileLink);
+        document.getElementById("shareProfileBtn")?.addEventListener("click", shareProfile);
+        document.getElementById("qrProfileBtn")?.addEventListener("click", showQR);
+        document.getElementById("addNewLinkBtn")?.addEventListener("click", addNewLink);
+        document.getElementById("updateProfileBtn")?.addEventListener("click", updateProfileFromAdmin);
+        document.getElementById("logoutAdminBtn")?.addEventListener("click", logoutAdmin);
+        document.getElementById("openAdminBtn")?.addEventListener("click", () => {
+            if(adminAuth) {
+                showAdminPanel(true);
+            } else {
+                showLoginModal();
+            }
+        });
+        
+        document.getElementById("loginSubmitBtn")?.addEventListener("click", () => {
+            const pin = document.getElementById("loginPinInput").value;
+            attemptLogin(pin);
+        });
+        
+        document.getElementById("loginPinInput")?.addEventListener("keypress", (e) => {
+            if(e.key === "Enter") {
+                const pin = document.getElementById("loginPinInput").value;
+                attemptLogin(pin);
+            }
+        });
+        
+        // Close modal click outside (simple)
+        document.getElementById("loginModal")?.addEventListener("click", (e) => {
+            if(e.target === document.getElementById("loginModal")) {
+                hideLoginModal();
+            }
+        });
+        
+        // Admin shortcut Ctrl+Shift+A
+        window.addEventListener("keydown", (e) => {
+            if(e.ctrlKey && e.shiftKey && e.key === 'A') {
+                e.preventDefault();
+                if(adminAuth) {
+                    showAdminPanel(true);
+                } else {
+                    showLoginModal();
+                }
+            }
+        });
+        
+        setTimeout(() => {
+            const loader = document.getElementById("loader");
+            if(loader) loader.style.opacity = "0";
+            setTimeout(() => { if(loader) loader.remove(); }, 800);
+        }, 800);
+    }
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>            border: 1px solid rgba(0, 255, 255, 0.3);
             border-radius: 28px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
         }
