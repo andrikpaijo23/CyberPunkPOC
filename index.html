@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>⚡ CYBERLINK | Neural Link Hub ⚡</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Rajdhani', 'Orbitron', 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            color: #eef5ff;
+            overflow-x: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: #05050a;
+        }
+
+        /* Dark base background */
+        html {
+            background: #05050a;
+        }
+
+        /* Canvas Background */
+        #cyberCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.85;
+            will-change: transform;
+            display: block;
+        }
+
+        /* Fallback gradient jika canvas lambat */
+        .bg-fallback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03050b);
+            z-index: -2;
+        }
+
+        /* Scanline Effect */
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 255, 0.03) 0px,
+                rgba(0, 255, 255, 0.03) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+            pointer-events: none;
+            z-index: 1;
+            animation: scanMove 8s linear infinite;
+        }
+
+        @keyframes scanMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Glitch Overlay */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            animation: glitchFlash 4s infinite;
+        }
+
+        @keyframes glitchFlash {
+            0%, 95%, 100% { opacity: 0; }
+            96% { opacity: 0.3; background: rgba(255, 0, 255, 0.1); }
+            97% { opacity: 0.2; background: rgba(0, 255, 255, 0.1); }
+            98% { opacity: 0.4; background: rgba(255, 0, 0, 0.05); }
+        }
+
+        /* Neon Card */
+        .neon-card {
+            background: rgba(10, 20, 30, 0.55);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 255, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hologram Link Effect */
+        .link-item {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid #0ff;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            will-change: transform;
+        }
+
+        .link-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        @media (hover: hover) {
+            .link-item:hover::before {
+                left: 100%;
+            }
+
+            .link-item:hover {
+                border-left-color: #f0f;
+                transform: translateX(12px) scale(1.02);
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), 0 0 60px rgba(255, 0, 255, 0.2);
+                background: rgba(20, 30, 55, 0.85);
+            }
+        }
+
+        /* Touch device optimization */
+        @media (hover: none) and (pointer: coarse) {
+            .link-item:active {
+                border-left-color: #f0f;
+                transform: translateX(8px) scale(1.01);
+                background: rgba(20, 30, 55, 0.85);
+            }
+        }
+
+        /* Glitch Text Real-time */
+        .glitch-text {
+            font-family: 'Orbitron', monospace;
+            position: relative;
+            animation: glitchText 3s infinite;
+        }
+
+        @keyframes glitchText {
+            0%, 100% { transform: skew(0deg, 0deg); text-shadow: 2px 0 #0ff, -2px 0 #f0f; }
+            95% { transform: skew(0deg, 0deg); text-shadow: 2px 0 #0ff, -2px 0 #f0f; }
+            96% { transform: skew(2deg, 1deg); text-shadow: 4px 0 #f0f, -4px 0 #0ff; }
+            97% { transform: skew(-2deg, -1deg); text-shadow: -4px 0 #f0f, 4px 0 #0ff; }
+            98% { transform: skew(1deg, 0.5deg); text-shadow: 2px 0 #0ff, -2px 0 #f0f; }
+        }
+
+        /* Button Neon Pulse */
+        .btn-neon {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .btn-neon::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(0, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        @media (hover: hover) {
+            .btn-neon:hover::after {
+                width: 300px;
+                height: 300px;
+            }
+
+            .btn-neon:hover {
+                background: rgba(0, 255, 255, 0.3);
+                box-shadow: 0 0 20px #0ff, 0 0 40px #0ff;
+                transform: scale(1.05);
+            }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            .btn-neon:active {
+                background: rgba(0, 255, 255, 0.3);
+                transform: scale(0.98);
+            }
+        }
+
+        /* Custom Scrollbar Cyber */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0f1e;
+            box-shadow: inset 0 0 5px #0ff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0ff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #0ff;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f0f;
+            box-shadow: 0 0 10px #f0f;
+        }
+
+        /* Loading Screen Cyber */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #010105;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+        }
+
+        .cyber-loader {
+            width: 100px;
+            height: 100px;
+            border: 3px solid #0ff;
+            border-top: 3px solid #f0f;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 30px #0ff, 0 0 60px #f0f;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Modal Cyber */
+        .modal-cyber {
+            animation: modalGlow 0.4s ease-out;
+        }
+
+        @keyframes modalGlow {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+                filter: blur(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        /* Glassmorphism Enhanced */
+        .glass-premium {
+            background: rgba(5, 10, 20, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 255, 255, 0.25);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 640px) {
+            .glitch-text {
+                font-size: 2rem;
+            }
+            .link-item {
+                margin: 0.5rem 0;
+            }
+        }
+
+        @media (min-width: 641px) and (max-width: 768px) {
+            .glitch-text {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .glitch-text {
+                font-size: 3rem;
+            }
+        }
+
+        /* Performance optimizations */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Smooth transitions */
+        button, a, .link-item, .btn-neon {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Responsive text sizing */
+        .responsive-title {
+            font-size: clamp(1.5rem, 5vw, 3rem);
+        }
+
+        .responsive-subtitle {
+            font-size: clamp(0.875rem, 3vw, 1rem);
+        }
+
+        /* Touch-friendly tap targets */
+        @media (hover: none) and (pointer: coarse) {
+            button, .btn-neon, .link-item {
+                min-height: 48px;
+            }
+        }
+
+        /* Data stream effect */
+        .link-item .data-stream {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 255, 0.05) 2px,
+                rgba(0, 255, 255, 0.05) 4px
+            );
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .link-item:hover .data-stream {
+            opacity: 1;
+            animation: dataFlow 0.5s linear infinite;
+        }
+
+        @keyframes dataFlow {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-fallback"></div>
+<canvas id="cyberCanvas"></canvas>
+<div class="scan-line"></div>
+<div class="glitch-overlay"></div>
+
+<div id="loader" class="loader-overlay">
+    <div class="text-center">
+        <div class="cyber-loader mx-auto mb-6"></div>
+        <p class="text-cyan-400 text-2xl tracking-widest font-orbitron" id="loadingText">INITIALIZING<span class="dots">...</span></p>
+        <p class="text-pink-400 text-xs mt-4 font-mono">>_ SYSTEM BOOT SEQUENCE</p>
+    </div>
+</div>
+
+<div id="app" class="relative z-10 max-w-2xl mx-auto px-4 py-4 md:py-8 lg:py-10">
+    <div id="publicView">
+        <div class="text-center mb-6 md:mb-8 float-animation">
+            <div class="relative inline-block">
+                <div class="w-24 h-24 md:w-28 md:h-28 mx-auto rounded-full border-4 border-cyan-400 shadow-[0_0_30px_#0ff] overflow-hidden bg-black/50 backdrop-blur-sm">
+                    <img id="profileAvatar" src="https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider" alt="avatar" class="w-full h-full object-cover">
+                </div>
+                <div class="absolute -bottom-2 right-2 bg-pink-600 rounded-full p-1.5 shadow-lg animate-pulse"><i class="fas fa-bolt text-xs"></i></div>
+            </div>
+            <h1 id="profileName" class="glitch-text responsive-title font-extrabold mt-4 md:mt-5 tracking-wider" data-text="NEON_DRIFTER">NEON_DRIFTER</h1>
+            <p id="profileBio" class="text-cyan-300 mt-2 md:mt-3 max-w-sm mx-auto responsive-subtitle font-mono">⚡ fullstack cybernaut | digital alchemist ⚡</p>
+            <div class="flex justify-center gap-2 md:gap-3 mt-3 md:mt-4 flex-wrap">
+                <button id="copyProfileBtn" class="btn-neon text-xs md:text-sm px-3 md:px-4 py-2 rounded-full flex items-center gap-2"><i class="fas fa-copy"></i> <span class="hidden sm:inline">Copy</span></button>
+                <button id="shareProfileBtn" class="btn-neon text-xs md:text-sm px-3 md:px-4 py-2 rounded-full flex items-center gap-2"><i class="fas fa-share-alt"></i> <span class="hidden sm:inline">Share</span></button>
+                <button id="qrProfileBtn" class="btn-neon text-xs md:text-sm px-3 md:px-4 py-2 rounded-full flex items-center gap-2"><i class="fas fa-qrcode"></i> <span class="hidden sm:inline">QR</span></button>
+            </div>
+            <button id="openAdminBtn" class="mt-4 md:mt-5 text-xs md:text-sm text-cyan-400/80 hover:text-cyan-300 transition-all flex items-center gap-2 mx-auto border border-cyan-500/30 rounded-lg px-3 md:px-4 py-1.5 hover:border-cyan-400">
+                <i class="fas fa-terminal"></i> ACCESS TERMINAL [ADMIN]
+            </button>
+        </div>
+
+        <div id="linksContainer" class="space-y-3 md:space-y-4 mt-6 md:mt-8"></div>
+
+        <footer class="text-center text-gray-500 text-xs mt-10 md:mt-12 pb-6 font-mono tracking-wider border-t border-cyan-500/20 pt-6">
+            <i class="fas fa-copyright"></i> 2124 • NEON NEXUS v2.0 • <i class="fas fa-shield-alt"></i> ENCRYPTED
+        </footer>
+    </div>
+
+    <div id="adminPanel" class="hidden glass-premium rounded-2xl p-4 md:p-5 mt-4 border-2 border-cyan-500/50">
+        <div class="flex justify-between items-center border-b border-cyan-500/40 pb-3 mb-4">
+            <h2 class="text-xl md:text-2xl font-orbitron text-cyan-300"><i class="fas fa-skull"></i> ADMIN_TERMINAL</h2>
+            <button id="logoutAdminBtn" class="text-pink-400 bg-black/60 px-3 py-1 rounded-lg text-sm hover:bg-pink-500/20 transition"><i class="fas fa-sign-out-alt"></i> EXIT</button>
+        </div>
+        
+        <div class="p-3 rounded-xl mb-4 grid grid-cols-1 gap-3 bg-black/40">
+            <input type="text" id="adminName" placeholder="Display Name" class="bg-black/60 border border-cyan-400/50 rounded-lg p-2 text-white focus:border-pink-500 transition text-sm md:text-base">
+            <input type="text" id="adminBio" placeholder="Bio" class="bg-black/60 border border-cyan-400/50 rounded-lg p-2 text-white focus:border-pink-500 transition text-sm md:text-base">
+            <input type="text" id="adminAvatar" placeholder="Avatar URL" class="bg-black/60 border border-cyan-400/50 rounded-lg p-2 text-white focus:border-pink-500 transition text-sm md:text-base">
+            <button id="updateProfileBtn" class="bg-gradient-to-r from-cyan-600 to-purple-600 py-2 rounded-lg font-bold hover:shadow-[0_0_20px_#0ff] transition text-sm md:text-base">UPDATE PROFILE</button>
+        </div>
+
+        <h3 class="text-lg md:text-xl font-bold text-pink-300 mb-2"><i class="fas fa-link"></i> LINK_MANAGER</h3>
+        <div id="adminLinksList" class="space-y-2 max-h-80 overflow-y-auto mb-4 p-1"></div>
+        <div class="mt-3 grid grid-cols-1 gap-3">
+            <button id="addNewLinkBtn" class="btn-neon py-2 rounded-xl w-full flex items-center justify-center gap-2 text-sm md:text-base"><i class="fas fa-plus-circle"></i> ADD NEW LINK</button>
+            <p class="text-[10px] text-center text-gray-400"><i class="fas fa-grip-vertical"></i> DRAG TO REORDER</p>
+        </div>
+    </div>
+</div>
+
+<div id="loginModal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center hidden p-4">
+    <div class="modal-cyber glass-premium rounded-2xl p-6 md:p-8 w-full max-w-md mx-4 border-2 border-cyan-500">
+        <div class="text-center mb-6">
+            <i class="fas fa-terminal text-4xl md:text-5xl text-cyan-400 mb-3 animate-pulse"></i>
+            <h2 class="text-2xl md:text-3xl font-orbitron font-bold bg-gradient-to-r from-cyan-400 to-pink-500 bg-clip-text text-transparent">AUTHENTICATION</h2>
+            <p class="text-gray-400 text-xs md:text-sm mt-2 font-mono">[ SECURE TERMINAL ACCESS ]</p>
+        </div>
+        <div class="space-y-4">
+            <div class="relative">
+                <i class="fas fa-key absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400"></i>
+                <input type="password" id="loginPinInput" placeholder="ENTER PIN CODE" class="w-full bg-black/80 border-2 border-cyan-500/50 rounded-xl py-3 pl-10 pr-4 text-white font-mono text-base md:text-lg focus:outline-none focus:border-pink-500 transition">
+            </div>
+            <button id="loginSubmitBtn" class="w-full bg-gradient-to-r from-cyan-600 to-purple-600 py-3 rounded-xl font-bold text-base md:text-lg hover:shadow-[0_0_30px_#0ff] transition-all transform hover:scale-105">🚀 VERIFY ACCESS</button>
+            <p class="text-center text-xs text-gray-500 mt-4">🔐 DEMO PIN: <span class="text-cyan-400 font-bold animate-pulse">1234</span></p>
+        </div>
+    </div>
+</div>
+
+<audio id="clickSound" preload="auto">
+    <source src="https://www.soundjay.com/misc/sounds/beep-07.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    // Canvas Background Animation
+    const canvas = document.getElementById('cyberCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        let particles = [];
+        let time = 0;
+        let canvasWidth, canvasHeight;
+        
+        function resizeCanvas() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            initParticles();
+        }
+        
+        function initParticles() {
+            particles = [];
+            const count = window.innerWidth < 768 ? 60 : 120;
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvasWidth,
+                    y: Math.random() * canvasHeight,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: (Math.random() - 0.5) * 1.2,
+                    size: Math.random() * 2 + 0.5,
+                    alpha: Math.random() * 0.5 + 0.2
+                });
+            }
+        }
+        
+        function draw() {
+            if (!ctx || !canvasWidth || !canvasHeight) return;
+            
+            // Clear with dark background
+            ctx.fillStyle = '#05050a';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Grid effect
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            const gridSize = window.innerWidth < 768 ? 40 : 50;
+            for (let i = 0; i < canvasWidth; i += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvasHeight);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvasWidth, i);
+                ctx.stroke();
+            }
+            
+            // Draw particles
+            particles.forEach(p => {
+                // Update position
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = canvasWidth;
+                if (p.x > canvasWidth) p.x = 0;
+                if (p.y < 0) p.y = canvasHeight;
+                if (p.y > canvasHeight) p.y = 0;
+                
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 255, 255, ${p.alpha})`;
+                ctx.fill();
+            });
+            
+            // Draw connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.strokeStyle = `rgba(0, 255, 255, ${0.08 * (1 - dist / 100)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            // Neon wave
+            time += 0.02;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(255, 0, 255, 0.12)`;
+            ctx.lineWidth = 1.5;
+            for (let x = 0; x < canvasWidth; x += 30) {
+                const y = canvasHeight / 2 + Math.sin(x * 0.01 + time) * 40 + Math.sin(time * 2) * 20;
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            animationFrameId = requestAnimationFrame(draw);
+        }
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+        
+        resizeCanvas();
+        draw();
+        
+        window.addEventListener('beforeunload', () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        });
+    }
+    
+    // Loading animation
+    const loadingText = document.getElementById('loadingText');
+    let dots = 0;
+    const interval = setInterval(() => {
+        if (loadingText) {
+            dots = (dots + 1) % 4;
+            loadingText.innerHTML = `INITIALIZING${'.'.repeat(dots)}`;
+        }
+    }, 500);
+    
+    setTimeout(() => {
+        clearInterval(interval);
+        const loader = document.getElementById("loader");
+        if(loader) loader.style.opacity = "0";
+        setTimeout(() => { if(loader) loader.remove(); }, 800);
+    }, 2000);
+    
+    // Data Management
+    let appData = {
+        profile: {
+            name: "NEON_DRIFTER",
+            bio: "⚡ fullstack cybernaut | digital alchemist ⚡",
+            avatar: "https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider"
+        },
+        links: [
+            { title: "YouTube", url: "https://youtube.com", emoji: "🎬" },
+            { title: "GitHub", url: "https://github.com", emoji: "🐙" },
+            { title: "Twitch", url: "https://twitch.tv", emoji: "🎮" },
+            { title: "Portfolio", url: "https://neonforge.dev", emoji: "⚡" }
+        ]
+    };
+    
+    let adminAuth = false;
+    const ADMIN_PIN = "1234";
+    
+    function saveToLocal() {
+        localStorage.setItem("cyberlink_data", JSON.stringify(appData));
+    }
+    
+    function loadFromLocal() {
+        const raw = localStorage.getItem("cyberlink_data");
+        if(raw) {
+            try {
+                const saved = JSON.parse(raw);
+                if(saved.profile && saved.links) appData = saved;
+            } catch(e) {}
+        }
+        renderPublicLinks();
+        if(adminAuth) renderAdminLinksList();
+        updateProfileUI();
+    }
+    
+    function renderPublicLinks() {
+        const container = document.getElementById("linksContainer");
+        if(!container) return;
+        if(!appData.links.length) {
+            container.innerHTML = `<div class="text-center text-gray-400 p-6 neon-card rounded-2xl">🚫 NO LINKS FOUND</div>`;
+            return;
+        }
+        container.innerHTML = appData.links.map((link, idx) => `
+            <a href="${link.url}" target="_blank" rel="noopener noreferrer" class="link-item block p-3 md:p-4 rounded-xl transition-all duration-300 group relative">
+                <div class="data-stream"></div>
+                <div class="flex items-center justify-between relative z-10">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl md:text-3xl drop-shadow-[0_0_8px_#0ff] transition-all group-hover:scale-110">${escapeHtml(link.emoji) || '🔗'}</span>
+                        <span class="font-orbitron font-semibold text-base md:text-lg tracking-wide">${escapeHtml(link.title)}</span>
+                    </div>
+                    <i class="fas fa-arrow-right text-cyan-400 opacity-70 group-hover:opacity-100 group-hover:translate-x-2 transition-all text-sm md:text-base"></i>
+                </div>
+                <div class="text-xs text-gray-400 truncate mt-1 font-mono">${escapeHtml(link.url)}</div>
+            </a>
+        `).join('');
+    }
+    
+    function updateProfileUI() {
+        const nameEl = document.getElementById("profileName");
+        if(nameEl) {
+            nameEl.innerText = appData.profile.name;
+            nameEl.setAttribute("data-text", appData.profile.name);
+        }
+        const bioEl = document.getElementById("profileBio");
+        if(bioEl) bioEl.innerHTML = appData.profile.bio;
+        const avatarImg = document.getElementById("profileAvatar");
+        if(avatarImg) avatarImg.src = appData.profile.avatar || "https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider";
+    }
+    
+    let sortableInstance = null;
+    function renderAdminLinksList() {
+        const adminContainer = document.getElementById("adminLinksList");
+        if(!adminContainer) return;
+        if(!appData.links.length) {
+            adminContainer.innerHTML = `<div class="text-center text-gray-400 p-4">EMPTY</div>`;
+            if(sortableInstance) sortableInstance.destroy();
+            return;
+        }
+        adminContainer.innerHTML = appData.links.map((link, idx) => `
+            <div class="admin-link-item bg-black/40 rounded-lg p-3 border-l-4 border-cyan-500 flex justify-between items-center gap-2" data-idx="${idx}">
+                <div class="flex items-center gap-3 flex-1 cursor-grab drag-handle">
+                    <i class="fas fa-grip-vertical text-gray-400 text-sm"></i>
+                    <span class="text-xl">${escapeHtml(link.emoji) || '🔗'}</span>
+                    <div class="flex flex-col">
+                        <span class="font-bold text-sm">${escapeHtml(link.title)}</span>
+                        <span class="text-xs text-gray-400 truncate max-w-[120px] md:max-w-[200px]">${escapeHtml(link.url)}</span>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="edit-link-btn text-yellow-300 hover:text-yellow-500 p-1" data-idx="${idx}"><i class="fas fa-edit text-sm"></i></button>
+                    <button class="delete-link-btn text-red-400 hover:text-red-600 p-1" data-idx="${idx}"><i class="fas fa-trash-alt text-sm"></i></button>
+                </div>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.edit-link-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                editLinkDialog(idx);
+            });
+        });
+        document.querySelectorAll('.delete-link-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                if(confirm("DELETE THIS LINK?")) {
+                    appData.links.splice(idx, 1);
+                    saveToLocal();
+                    renderPublicLinks();
+                    renderAdminLinksList();
+                    reinitSortable();
+                    playClick();
+                }
+            });
+        });
+        reinitSortable();
+    }
+    
+    function reinitSortable() {
+        const container = document.getElementById("adminLinksList");
+        if(!container) return;
+        if(sortableInstance) sortableInstance.destroy();
+        sortableInstance = new Sortable(container, {
+            handle: '.drag-handle',
+            animation: 200,
+            onEnd: function() {
+                const items = document.querySelectorAll('#adminLinksList .admin-link-item');
+                const newOrder = [];
+                items.forEach(item => {
+                    const idx = parseInt(item.getAttribute('data-idx'));
+                    if(!isNaN(idx) && appData.links[idx]) newOrder.push(appData.links[idx]);
+                });
+                if(newOrder.length === appData.links.length) {
+                    appData.links = newOrder;
+                    saveToLocal();
+                    renderPublicLinks();
+                }
+            }
+        });
+    }
+    
+    function editLinkDialog(idx) {
+        const link = appData.links[idx];
+        const newTitle = prompt("EDIT TITLE:", link.title);
+        if(newTitle !== null && newTitle.trim() !== "") link.title = newTitle.trim();
+        const newUrl = prompt("EDIT URL:", link.url);
+        if(newUrl !== null && newUrl.trim() !== "") link.url = newUrl.trim();
+        const newEmoji = prompt("EDIT EMOJI:", link.emoji);
+        if(newEmoji !== null && newEmoji.trim() !== "") link.emoji = newEmoji.trim();
+        saveToLocal();
+        renderPublicLinks();
+        renderAdminLinksList();
+        playClick();
+    }
+    
+    function addNewLink() {
+        let title = prompt("LINK TITLE:", "New Link");
+        if(!title) title = "CyberLink";
+        let url = prompt("URL:", "https://");
+        if(!url) url = "https://example.com";
+        let emoji = prompt("EMOJI:", "🔗");
+        if(!emoji) emoji = "🔗";
+        appData.links.push({ title: title.trim(), url: url.trim(), emoji: emoji.trim() });
+        saveToLocal();
+        renderPublicLinks();
+        renderAdminLinksList();
+        playClick();
+    }
+    
+    function showAdminPanel(show) {
+        const adminDiv = document.getElementById("adminPanel");
+        const publicDiv = document.getElementById("publicView");
+        if(show) {
+            adminDiv.classList.remove("hidden");
+            publicDiv.classList.add("hidden");
+            renderAdminLinksList();
+            document.getElementById("adminName").value = appData.profile.name;
+            document.getElementById("adminBio").value = appData.profile.bio;
+            document.getElementById("adminAvatar").value = appData.profile.avatar;
+        } else {
+            adminDiv.classList.add("hidden");
+            publicDiv.classList.remove("hidden");
+            updateProfileUI();
+            renderPublicLinks();
+        }
+    }
+    
+    function showLoginModal() {
+        document.getElementById("loginModal").classList.remove("hidden");
+        document.getElementById("loginPinInput").value = "";
+        document.getElementById("loginPinInput").focus();
+    }
+    
+    function hideLoginModal() {
+        document.getElementById("loginModal").classList.add("hidden");
+    }
+    
+    function attemptLogin(pin) {
+        if(pin === ADMIN_PIN) {
+            adminAuth = true;
+            localStorage.setItem("cyber_admin_auth", "true");
+            hideLoginModal();
+            showAdminPanel(true);
+            playClick();
+            return true;
+        } else {
+            alert("❌ ACCESS DENIED! Invalid PIN");
+            playClick();
+            return false;
+        }
+    }
+    
+    function logoutAdmin() {
+        adminAuth = false;
+        localStorage.removeItem("cyber_admin_auth");
+        showAdminPanel(false);
+        playClick();
+    }
+    
+    function updateProfileFromAdmin() {
+        const newName = document.getElementById("adminName").value.trim() || "Neon User";
+        const newBio = document.getElementById("adminBio").value.trim() || "cyber entity";
+        const newAvatar = document.getElementById("adminAvatar").value.trim() || "https://api.dicebear.com/7.x/cyberpunk/svg?seed=NeonRider";
+        appData.profile.name = newName;
+        appData.profile.bio = newBio;
+        appData.profile.avatar = newAvatar;
+        saveToLocal();
+        updateProfileUI();
+        alert("✅ PROFILE UPDATED");
+        playClick();
+    }
+    
+    function playClick() {
+        const sound = document.getElementById("clickSound");
+        if(sound) sound.play().catch(e=>console.log("audio needs user interaction"));
+    }
+    
+    function copyProfileLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("🔗 LINK COPIED TO CLIPBOARD");
+        playClick();
+    }
+    
+    function shareProfile() {
+        if(navigator.share) {
+            navigator.share({ title: appData.profile.name, text: appData.profile.bio, url: window.location.href });
+        } else {
+            alert("SHARE: " + window.location.href);
+        }
+        playClick();
+    }
+    
+    function showQR() {
+        let modalDiv = document.getElementById("qrModal");
+        if(!modalDiv) {
+            modalDiv = document.createElement("div");
+            modalDiv.id = "qrModal";
+            modalDiv.className = "fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4";
+            modalDiv.innerHTML = `<div class="glass-premium p-6 rounded-2xl text-center w-80 max-w-full border-2 border-cyan-500"><h3 class="text-xl font-orbitron mb-3 text-cyan-400">QR CODE</h3><div id="qrcodeContainer"></div><button id="closeQR" class="mt-4 bg-gradient-to-r from-cyan-600 to-purple-600 px-4 py-2 rounded-lg w-full">CLOSE</button></div>`;
+            document.body.appendChild(modalDiv);
+            document.getElementById("closeQR").addEventListener("click",()=>{
+                modalDiv.classList.add("hidden");
+            });
+        }
+        const container = document.getElementById("qrcodeContainer");
+        container.innerHTML = "";
+        new QRCode(container, {
+            text: window.location.href,
+            width: Math.min(200, window.innerWidth - 80),
+            height: Math.min(200, window.innerWidth - 80),
+            colorDark: "#0ff",
+            colorLight: "#000000",
+        });
+        modalDiv.classList.remove("hidden");
+        playClick();
+    }
+    
+    function init() {
+        loadFromLocal();
+        const authStored = localStorage.getItem("cyber_admin_auth");
+        if(authStored === "true") {
+            adminAuth = true;
+            showAdminPanel(true);
+        }
+        
+        document.getElementById("copyProfileBtn")?.addEventListener("click", copyProfileLink);
+        document.getElementById("shareProfileBtn")?.addEventListener("click", shareProfile);
+        document.getElementById("qrProfileBtn")?.addEventListener("click", showQR);
+        document.getElementById("addNewLinkBtn")?.addEventListener("click", addNewLink);
+        document.getElementById("updateProfileBtn")?.addEventListener("click", updateProfileFromAdmin);
+        document.getElementById("logoutAdminBtn")?.addEventListener("click", logoutAdmin);
+        document.getElementById("openAdminBtn")?.addEventListener("click", () => {
+            if(adminAuth) showAdminPanel(true);
+            else showLoginModal();
+        });
+        document.getElementById("loginSubmitBtn")?.addEventListener("click", () => {
+            attemptLogin(document.getElementById("loginPinInput").value);
+        });
+        document.getElementById("loginPinInput")?.addEventListener("keypress", (e) => {
+            if(e.key === "Enter") attemptLogin(e.target.value);
+        });
+        document.getElementById("loginModal")?.addEventListener("click", (e) => {
+            if(e.target === document.getElementById("loginModal")) hideLoginModal();
+        });
+        
+        window.addEventListener("keydown", (e) => {
+            if(e.ctrlKey && e.shiftKey && e.key === 'A') {
+                e.preventDefault();
+                if(adminAuth) showAdminPanel(true);
+                else showLoginModal();
+            }
+        });
+        
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                renderPublicLinks();
+            }, 100);
+        });
+    }
+    
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    window.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
